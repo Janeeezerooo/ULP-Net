@@ -6,23 +6,23 @@ import torch.nn.functional as F
 from scipy.optimize import linprog
 
 torch.backends.cudnn.benchmark = True
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ULPNetVariant(nn.Module):
     def __init__(self, k=32, use_global_ctx=True):
         super().__init__()
         self.use_global_ctx = use_global_ctx
         if use_global_ctx:
-            self.row_conv = nn.Sequential(nn.Conv2d(1, k, 1, bias=False), nn.BatchNorm2d(k), nn.ReLU(True))
-            self.col_conv = nn.Sequential(nn.Conv2d(1, k, 1, bias=False), nn.BatchNorm2d(k), nn.ReLU(True))
+            self.row_conv = nn.Sequential(nn.Conv2d(1, k, 1, bias=False), nn.BatchNorm2d(k), nn.LeakyReLU(0.01, True))
+            self.col_conv = nn.Sequential(nn.Conv2d(1, k, 1, bias=False), nn.BatchNorm2d(k), nn.LeakyReLU(0.01, True))
         else:
-            self.local_in = nn.Sequential(nn.Conv2d(1, 2 * k, 3, padding=1, bias=False), nn.BatchNorm2d(2 * k), nn.ReLU(True))
+            self.local_in = nn.Sequential(nn.Conv2d(1, 2 * k, 3, padding=1, bias=False), nn.BatchNorm2d(2 * k), nn.LeakyReLU(0.01, True))
         self.conv_blocks = nn.Sequential(
-            nn.Conv2d(2 * k, 64, 3, padding=1, bias=False), nn.BatchNorm2d(64), nn.ReLU(True),
-            nn.Conv2d(64, 128, 3, padding=1, bias=False), nn.BatchNorm2d(128), nn.ReLU(True),
+            nn.Conv2d(2 * k, 64, 3, padding=1, bias=False), nn.BatchNorm2d(64), nn.LeakyReLU(0.01, True),
+            nn.Conv2d(64, 128, 3, padding=1, bias=False), nn.BatchNorm2d(128), nn.LeakyReLU(0.01, True),
         )
         self.head = nn.Sequential(
-            nn.Conv2d(128, 256, 1, bias=False), nn.BatchNorm2d(256), nn.ReLU(True),
+            nn.Conv2d(128, 256, 1, bias=False), nn.BatchNorm2d(256), nn.LeakyReLU(0.01, True),
             nn.Conv2d(256, 1, 1),
         )
 

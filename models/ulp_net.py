@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class ULPNet(nn.Module):
-    def __init__(self, k: int = 32, act: str = "relu"):
+    def __init__(self, k: int = 32, act: str = "leaky_relu"):
         super().__init__()
         self.row_conv = nn.Sequential(nn.Conv2d(1, k, 1, bias=False), nn.BatchNorm2d(k), self._get_act(act))
         self.col_conv = nn.Sequential(nn.Conv2d(1, k, 1, bias=False), nn.BatchNorm2d(k), self._get_act(act))
@@ -17,7 +17,13 @@ class ULPNet(nn.Module):
 
     @staticmethod
     def _get_act(act: str) -> nn.Module:
-        return {"relu": nn.ReLU(True), "leaky_relu": nn.LeakyReLU(0.01, True), "gelu": nn.GELU(), "silu": nn.SiLU(True), "tanh": nn.Tanh()}[act]
+        return {
+            "relu": nn.ReLU(True),
+            "leaky_relu": nn.LeakyReLU(0.01, True),
+            "gelu": nn.GELU(),
+            "silu": nn.SiLU(True),
+            "tanh": nn.Tanh(),
+        }[act]
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         _, _, h, w = x.shape
