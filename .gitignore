@@ -1,6 +1,10 @@
 __pycache__/
 *.py[cod]
 *.log
-*.pt
-*.pth
-.DS_Store
+*.out
+*.err
+*.sh
+*.npy
+*.npz
+.ipynb_checkpoints/
+archive/
